@@ -8,6 +8,7 @@
 8. germany vs English 
 9. Language requirement
 10. relocation alowance & visa sponser
+11. Job description generation (language model)
 
 
 
