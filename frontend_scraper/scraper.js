@@ -14,3 +14,16 @@ function download(text, name, type) {
 }
 
 download(text_data, 'job_description', 'txt')
+
+
+function pausecomp(millis)
+{
+    var date = new Date();
+    var curDate = null;
+    do { curDate = new Date(); }
+    while(curDate-date < millis);
+}
+
+for (index in document.getElementsByClassName('result-card__full-card-link')){
+document.getElementsByClassName('result-card__full-card-link')[index].click()
+}
