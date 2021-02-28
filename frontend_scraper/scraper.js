@@ -1,6 +1,9 @@
 // simulates click to populate all text
 document.getElementsByClassName('show-more-less-html__button show-more-less-html__button--more')[0].click()
 
+// fetch text description
+let text_data = document.getElementsByClassName('description')[0].innerText
+
 function download(text, name, type) {
 
   var a = document.getElementsByTagName('a')[0]; // get proxy link element
@@ -9,3 +12,5 @@ function download(text, name, type) {
   a.download = name; // add download attribute to set file name
   a.click() // simulate click
 }
+
+download(text_data, 'job_description', 'txt')
