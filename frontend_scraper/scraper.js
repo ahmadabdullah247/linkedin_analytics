@@ -9,3 +9,4 @@ function download(text, name, type) {
   a.download = name; // add download attribute to set file name
   a.click() // simulate click
 }
+download()
