@@ -47,7 +47,6 @@ class LinkedInJobsScraper:
 
         self.scraper_logger.info('Writing job ids to file')
         job_ids_str = "\n".join(self.job_ids)
-        print(job_ids_str)
         write_to_file(job_ids_str)
 
         self.scraper_logger.info('Lets go again!')

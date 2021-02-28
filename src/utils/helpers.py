@@ -20,4 +20,4 @@ def get_logger():
 
 def write_to_file(data):
     with open('job_ids.txt','a+') as f:
-        f.write(data)
+        f.write('{}\n'.format(data))
