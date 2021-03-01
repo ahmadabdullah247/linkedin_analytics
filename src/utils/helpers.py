@@ -2,10 +2,10 @@ import logging
 import yaml
 from exceptions.exception import InvalidConfigurationException
 from datetime import datetime, timedelta
-from elasticsearch import Elasticsearch as es
+from dateutil.relativedelta import *
+from elasticsearch import Elasticsearch 
 import json
-
-
+ 
 def read_config(config_path):
     if not config_path:
         config_path = 'config/scraper_config.yaml'
@@ -36,12 +36,16 @@ def rel_time_to_absolute_datetime(relative_time_str):
     if 'day' in relative_time_str:
         date_n_days_ago = datetime.now() - timedelta(days=N)
     elif 'week' in relative_time_str:
-        date_n_days_ago = datetime.now() - timedelta(weeks=N)
+        date_n_days_ago = datetime.now() - relativedelta(months=-N)
     elif 'month' in relative_time_str:
-        date_n_days_ago = datetime.now() - timedelta(months=N)
+        date_n_days_ago = datetime.now() - relativedelta(months=-N)
 
     return str(date_n_days_ago).split(' ')[0]
 
-def write_to_es(index_name, data):
-   es.index(index=index_name, id=data['job_id'],     body=json.loads(data))
+def write_to_es(index_name, data, es_client):
+   str_data = json.dumps(data)
+   try:
+       es_client.index(index=index_name, id=data['job_id'], body=json.loads(str_data))
+   except:
+        pass
 

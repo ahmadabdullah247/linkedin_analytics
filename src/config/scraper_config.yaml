@@ -3,7 +3,7 @@ job_title_element: li
 
 job_title_element_class: 'result-card job-result-card result-card--with-hover-state'
 
-search_url: https://www.linkedin.com/jobs/search?keywords=Software%20Engineer&location=Berlin%2C%20Berlin%2C%20Germany&geoId=&trk=homepage-jobseeker_jobs-search-bar_search-submit&redirect=false&position=1&pageNum={}
+search_url: https://www.linkedin.com/jobs/search?keywords=software&location=Germany&geoId=101282230&trk=public_jobs_jobs-search-bar_search-submit&redirect=false&position=1&pageNum={}
 
 job_detail_url: https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{}
 
@@ -19,6 +19,8 @@ n_applicants_class: 'topcard__flavor--metadata topcard__flavor--bullet num-appli
 
 job_date_class: 'topcard__flavor--metadata posted-time-ago__text'
 
+job_location_class: 'topcard__flavor topcard__flavor--bullet'
+
 employer_name_class: 'topcard__org-name-link topcard__flavor--black-link'
 
 job_title_class: topcard__title
@@ -29,3 +31,7 @@ job_ids_file: job_ids.txt
 scraper_history_file: scraper_history.txt
 
 es_index: linked_jobs
+
+es_host: localhost
+
+es_port: 9200
