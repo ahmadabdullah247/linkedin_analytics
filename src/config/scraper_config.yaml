@@ -1,3 +1,4 @@
+## bs4 config
 job_title_element: li
 
 job_title_element_class: 'result-card job-result-card result-card--with-hover-state'
@@ -9,3 +10,22 @@ job_detail_url: https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{}
 job_id_element_identifier: data-id
 
 total_search_pages: 1000000
+
+li_jobs_api: https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{}
+
+job_meta_info_class: job-criteria__list
+
+n_applicants_class: 'topcard__flavor--metadata topcard__flavor--bullet num-applicants__caption'
+
+job_date_class: 'topcard__flavor--metadata posted-time-ago__text'
+
+employer_name_class: 'topcard__org-name-link topcard__flavor--black-link'
+
+job_title_class: topcard__title
+
+## tracking file config
+job_ids_file: job_ids.txt
+
+scraper_history_file: scraper_history.txt
+
+es_index: linked_jobs
