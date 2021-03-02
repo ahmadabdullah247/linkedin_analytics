@@ -17,16 +17,5 @@ def start_scraper():
         search_term = "%20".join(search_term.split())
         scraper.search_jobs_ids(search_term)
 
-
-@app.route('/api/v1/heartbeat/', methods=['GET'])
-def heartbeat():
-    return jsonify({'heartbeat':'scraper is alive!'})
-
-@app.route('/')
-def index():
-    """Return homepage."""
-    json_data = {'Hello': 'World!'}
-    return jsonify(json_data)
-
 if __name__ == '__main__':
     app.run()
