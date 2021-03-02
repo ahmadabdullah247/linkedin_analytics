@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from scraper.linkedin_jobs_scraper import LinkedInJobsScraper
+from after_response import AfterResponse
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*/*/*": {"origins": "*"}})
+AfterResponse(app)
 
 @app.route('/api/v1/scrape_linkedin/', methods=['GET'])
 def scrape_linkedin():    
