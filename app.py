@@ -17,5 +17,16 @@ def start_scraper():
         search_term = "%20".join(search_term.split())
         scraper.search_jobs_ids(search_term)
 
+def offline_worker():
+    scraper = LinkedInJobsScraper(num_jobs=-1, query=None)
+    while(1):
+        for search_term in scraper.scraper_config['search_terms']:
+            search_term = "%20".join(search_term.split())
+            scraper.search_jobs_ids(search_term)
+
+    
+
 if __name__ == '__main__':
-    app.run()
+    offline_worker()
+
+    #app.run()
