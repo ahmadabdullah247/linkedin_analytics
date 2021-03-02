@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import *
 from elasticsearch import Elasticsearch 
 import json
- 
+import pymongo
+
 def read_config(config_path):
     credentials_path = 'config/credentials.yaml'
     if not config_path:
@@ -35,6 +36,17 @@ def read_from_file(file_path):
     with open(file_path,'r') as f:
         return [job_id.rstrip('\n') for job_id in f.readlines()] ## preprocess job_ids
 
+def get_mongo_client(scraper_config, credentials):
+    try:
+        mongo_client = pymongo.MongoClient(scraper_config['mongo_connect_url'].format(credentials['mongo_username'], credentials['mongo_password'], scraper_config['mongo_db']))
+        mongo_db = mongo_client[scraper_config['mongo_db']]
+        mongo_collection = mongo_db[scraper_config['mongo_collection']]
+    except Exception as e:
+        print(e)
+    
+    return mongo_collection 
+
+
 
 def rel_time_to_absolute_datetime(relative_time_str):
     N = int(relative_time_str.split(' ')[0])
@@ -52,10 +64,15 @@ def write_to_es(index_name, data, es_client):
    str_data = json.dumps(data)
    print(data)
    try:
-       res = es_client.exists(index=index_name, id=data['job_id'])
+       res = es_client.exists(index=index_name, id=data['_id'])
        print('searched ids')
        print(res)
-       es_client.index(index=index_name, id=data['job_id'], body=json.loads(str_data))
+       es_client.index(index=index_name, id=data['_id'], body=json.loads(str_data))
    except  Exception as e: print(e)
+
+
+def write_to_mongo(mongo_collection, data):
+    response = mongo_collection.insert_one(data)
+    return response
         
 

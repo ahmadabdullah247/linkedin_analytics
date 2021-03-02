@@ -18,9 +18,10 @@ class LinkedInJobsScraper:
         
         self.scraper_config, self.credentials = read_config(config_path) ## loading configuration
         self.scraper_logger = get_logger() ## get logger for logging system state
-        self.scraper_history = list(set(read_from_file(self.scraper_config['scraper_history_file'])))
+       
         
-        print(self.credentials)
+        ## connecting to mongo db cloud
+        self.mongo_collection = get_mongo_client(self.scraper_config, self.credentials)
 
         self.es_client = Elasticsearch(hosts=self.scraper_config['es_host'])
                                         
@@ -70,7 +71,7 @@ class LinkedInJobsScraper:
         soup = BeautifulSoup(response.text, "html.parser")
         job_info = {}
         ## find jd section
-        job_info['job_id'] = job_id
+        job_info['_id'] = job_id
         if soup.find("h2",attrs={"class":self.scraper_config['job_title_class']}):
             job_info['job_title'] = soup.find("h2",attrs={"class":self.scraper_config['job_title_class']}).text
         else:
@@ -115,19 +116,16 @@ class LinkedInJobsScraper:
         while (len(self.job_ids)>0): ## iterate until no jobs left
             self.scraper_logger.info('Fetching data for JOB[{}/{}]'.format((total_jobs - len(self.job_ids)), total_jobs))
             job_id = self.job_ids.pop() ## get last job in queue
-            
-            if job_id not in self.scraper_history:
-                job_info = self.get_job_data(job_id)
+            job_info = self.get_job_data(job_id)
                 
                 if job_info:
                     ## TODO: update status and dump to ES
-                    self.scraper_history.append(job_id)
                     write_to_file(str(job_id), self.scraper_config['scraper_history_file'])
-                    self.scraper_logger.info('dumping to elasticsearch')
-                    write_to_es(self.scraper_config['es_index'], job_info, self.es_client)
-            else:
-                self.scraper_logger.info('[SKIPPING]:JOB_ID: {} has already been crawled'.format(job_id))
-                continue
+                    self.scraper_logger.info('dumping to mongo')
+                    #write_to_es(self.scraper_config['es_index'], job_info, self.es_client)
+                    response = write_to_mongo(job_info, self.mongo_collection)
+                    self.scraper_logger.info('[MongoDB] for new row insert: {}'.format(response))
+
             time.sleep(1) ## sleep for one second
             
 
@@ -137,10 +135,10 @@ class LinkedInJobsScraper:
 def main():
     #job_ids = list(set(read_from_file(scraper.scraper_config['job_ids_file'])))
     scraper = LinkedInJobsScraper(num_jobs=-1, query=None)
-    """ for search_term in scraper.scraper_config['search_terms']:
+    for search_term in scraper.scraper_config['search_terms']:
         search_term = "%20".join(search_term.split())
-        scraper.search_jobs_ids(search_term)"""
-    #write_to_es(scraper.scraper_config['es_index'], {'job_info':'abc'}, scraper.es_client)
+        scraper.search_jobs_ids(search_term)
+
 if __name__ == "__main__":
     main()
     

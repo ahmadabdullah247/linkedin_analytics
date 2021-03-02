@@ -65,4 +65,6 @@ search_terms:
   - 'software test'
 
 ## mongodb config
-mongo_connect_url: mongodb+srv://{}:{}@cluster0.dopto.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+mongo_connect_url: mongodb+srv://{}:{}@cluster0.dopto.mongodb.net/{}?retryWrites=true&w=majority
+mongo_db: linkedin_jobs
+mongo_collection: linkedin_jobs
