@@ -1,1 +1,1 @@
-worker: python src/linkedin_jobs_scraper.py
+web: gunicorn app:app
