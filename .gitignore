@@ -28,11 +28,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-<<<<<<< HEAD
-
-=======
 src/config/passwords.yaml
->>>>>>> c2b3d52621c4d4d2c120447b6d78ffe5a4b514a5
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -134,3 +130,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+.vscode 
