@@ -17,3 +17,4 @@ soupsieve==2.2
 urllib3==1.26.3
 flask
 flask-cors
+werkzeug

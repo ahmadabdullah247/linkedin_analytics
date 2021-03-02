@@ -42,9 +42,12 @@ class LinkedInJobsScraper:
 
             ## extract job ids from the selected page
             self.extract_job_ids(soup)
+            
+            time.sleep(5) ## sleep for 5 seconds
 
             if len(self.job_ids):
                 self.fetch_job_info()
+            
 
     def extract_job_ids(self, soup):
         jobs = soup.findAll(self.scraper_config['job_title_element'], 
@@ -125,6 +128,5 @@ class LinkedInJobsScraper:
                 response = write_to_mongo(self.mongo_collection, job_info)
                 self.scraper_logger.info('[MongoDB] for new row insert: {}'.format(response))
 
-            time.sleep(1) ## sleep for one second
+            time.sleep(5) ## sleep for 5 seconds
             
-
