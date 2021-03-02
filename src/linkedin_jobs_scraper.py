@@ -120,7 +120,6 @@ class LinkedInJobsScraper:
                 
             if job_info:
                 ## TODO: update status and dump to ES
-                write_to_file(str(job_id), self.scraper_config['scraper_history_file'])
                 self.scraper_logger.info('dumping to mongo')
                 #write_to_es(self.scraper_config['es_index'], job_info, self.es_client)
                 response = write_to_mongo(self.mongo_collection, job_info)
@@ -135,9 +134,10 @@ class LinkedInJobsScraper:
 def main():
     #job_ids = list(set(read_from_file(scraper.scraper_config['job_ids_file'])))
     scraper = LinkedInJobsScraper(num_jobs=-1, query=None)
-    for search_term in scraper.scraper_config['search_terms']:
-        search_term = "%20".join(search_term.split())
-        scraper.search_jobs_ids(search_term)
+    while(1):
+        for search_term in scraper.scraper_config['search_terms']:
+            search_term = "%20".join(search_term.split())
+            scraper.search_jobs_ids(search_term)
 
 if __name__ == "__main__":
     main()
