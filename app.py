@@ -13,6 +13,9 @@ def scrape_linkedin():
     
     return "scraping completed..."
 
+@app.route('/api/v1/heartbeat/', methods=['GET'])
+def heartbeat():
+    return 'scraper is alive!'
 
 if __name__ == '__main__':
     app.run()

@@ -17,5 +17,5 @@ pip install -r requirements.txt
 ```
 4. You can run the server by using any one of the following commands
 ```bash
-python index.py
+python app.py
 ```
