@@ -1,3 +1,5 @@
+src/config/passwords.yaml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -26,7 +28,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-src/confing/passwords.yaml
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
