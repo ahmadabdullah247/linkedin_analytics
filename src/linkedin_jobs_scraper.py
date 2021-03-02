@@ -23,7 +23,7 @@ class LinkedInJobsScraper:
         ## connecting to mongo db cloud
         self.mongo_collection = get_mongo_client(self.scraper_config, self.credentials)
 
-        self.es_client = Elasticsearch(hosts=self.scraper_config['es_host'])
+        #self.es_client = Elasticsearch(hosts=self.scraper_config['es_host'])
                                         
     
     def search_jobs_ids(self, search_term):
@@ -118,13 +118,13 @@ class LinkedInJobsScraper:
             job_id = self.job_ids.pop() ## get last job in queue
             job_info = self.get_job_data(job_id)
                 
-                if job_info:
-                    ## TODO: update status and dump to ES
-                    write_to_file(str(job_id), self.scraper_config['scraper_history_file'])
-                    self.scraper_logger.info('dumping to mongo')
-                    #write_to_es(self.scraper_config['es_index'], job_info, self.es_client)
-                    response = write_to_mongo(job_info, self.mongo_collection)
-                    self.scraper_logger.info('[MongoDB] for new row insert: {}'.format(response))
+            if job_info:
+                ## TODO: update status and dump to ES
+                write_to_file(str(job_id), self.scraper_config['scraper_history_file'])
+                self.scraper_logger.info('dumping to mongo')
+                #write_to_es(self.scraper_config['es_index'], job_info, self.es_client)
+                response = write_to_mongo(self.mongo_collection, job_info)
+                self.scraper_logger.info('[MongoDB] for new row insert: {}'.format(response))
 
             time.sleep(1) ## sleep for one second
             

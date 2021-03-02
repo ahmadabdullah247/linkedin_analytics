@@ -65,14 +65,16 @@ def write_to_es(index_name, data, es_client):
    print(data)
    try:
        res = es_client.exists(index=index_name, id=data['_id'])
-       print('searched ids')
-       print(res)
        es_client.index(index=index_name, id=data['_id'], body=json.loads(str_data))
    except  Exception as e: print(e)
 
 
 def write_to_mongo(mongo_collection, data):
-    response = mongo_collection.insert_one(data)
+    response = None
+    try:
+        response = mongo_collection.insert_one(data)
+    except:
+        response = "Job already has been crawled."
     return response
         
 
