@@ -16,7 +16,7 @@ def read_config(config_path):
         # scalar values to Python the dictionary format
         scraper_config = yaml.load(file, Loader=yaml.FullLoader)
         
-    with open(r'{}'.format(config_path)) as creds_file:
+    with open(r'{}'.format(credentials_path)) as creds_file:
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
         credentials = yaml.load(creds_file, Loader=yaml.FullLoader)

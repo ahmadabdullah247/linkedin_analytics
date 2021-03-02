@@ -19,8 +19,8 @@ class LinkedInJobsScraper:
         self.scraper_config, self.credentials = read_config(config_path) ## loading configuration
         self.scraper_logger = get_logger() ## get logger for logging system state
         self.scraper_history = list(set(read_from_file(self.scraper_config['scraper_history_file'])))
-
         
+        print(self.credentials)
 
         self.es_client = Elasticsearch(hosts=self.scraper_config['es_host'])
                                         
@@ -140,7 +140,7 @@ def main():
     """ for search_term in scraper.scraper_config['search_terms']:
         search_term = "%20".join(search_term.split())
         scraper.search_jobs_ids(search_term)"""
-    write_to_es(scraper.scraper_config['es_index'], {'job_info':'abc'}, scraper.es_client)
+    #write_to_es(scraper.scraper_config['es_index'], {'job_info':'abc'}, scraper.es_client)
 if __name__ == "__main__":
     main()
     
