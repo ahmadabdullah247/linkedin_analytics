@@ -4,7 +4,7 @@ import time
 from bs4 import BeautifulSoup
 import time
 import pandas as pd
-from utils.helpers import *
+from scraper.utils.helpers import *
 from urllib.parse import urlencode, quote_plus
 
 
@@ -128,17 +128,3 @@ class LinkedInJobsScraper:
             time.sleep(1) ## sleep for one second
             
 
-            
-        
-
-def main():
-    #job_ids = list(set(read_from_file(scraper.scraper_config['job_ids_file'])))
-    scraper = LinkedInJobsScraper(num_jobs=-1, query=None)
-    while(1):
-        for search_term in scraper.scraper_config['search_terms']:
-            search_term = "%20".join(search_term.split())
-            scraper.search_jobs_ids(search_term)
-
-if __name__ == "__main__":
-    main()
-    

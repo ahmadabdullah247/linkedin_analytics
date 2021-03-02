@@ -1,16 +1,16 @@
 import logging
 import yaml
-from exceptions.exception import InvalidConfigurationException
+from scraper.exceptions.exception import InvalidConfigurationException
 from datetime import datetime, timedelta
 from dateutil.relativedelta import *
-from elasticsearch import Elasticsearch 
+#from elasticsearch import Elasticsearch 
 import json
 import pymongo
 
 def read_config(config_path):
-    credentials_path = 'config/credentials.yaml'
+    credentials_path = 'scraper/config/credentials.yaml'
     if not config_path:
-        config_path = 'config/scraper_config.yaml'
+        config_path = 'scraper/config/scraper_config.yaml'
 
     with open(r'{}'.format(config_path)) as file:
         # The FullLoader parameter handles the conversion from YAML
@@ -37,6 +37,7 @@ def read_from_file(file_path):
         return [job_id.rstrip('\n') for job_id in f.readlines()] ## preprocess job_ids
 
 def get_mongo_client(scraper_config, credentials):
+    mongo_collection = None
     try:
         mongo_client = pymongo.MongoClient(scraper_config['mongo_connect_url'].format(credentials['mongo_username'], credentials['mongo_password'], scraper_config['mongo_db']))
         mongo_db = mongo_client[scraper_config['mongo_db']]
