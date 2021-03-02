@@ -7,6 +7,7 @@ from elasticsearch import Elasticsearch
 import json
  
 def read_config(config_path):
+    credentials_path = 'config/credentials.yaml'
     if not config_path:
         config_path = 'config/scraper_config.yaml'
 
@@ -14,8 +15,13 @@ def read_config(config_path):
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
         scraper_config = yaml.load(file, Loader=yaml.FullLoader)
+        
+    with open(r'{}'.format(config_path)) as creds_file:
+        # The FullLoader parameter handles the conversion from YAML
+        # scalar values to Python the dictionary format
+        credentials = yaml.load(creds_file, Loader=yaml.FullLoader)
     
-    return scraper_config
+    return (scraper_config, credentials)
 
 def get_logger():
     logging.basicConfig(level=logging.DEBUG)
@@ -44,8 +50,12 @@ def rel_time_to_absolute_datetime(relative_time_str):
 
 def write_to_es(index_name, data, es_client):
    str_data = json.dumps(data)
+   print(data)
    try:
+       res = es_client.exists(index=index_name, id=data['job_id'])
+       print('searched ids')
+       print(res)
        es_client.index(index=index_name, id=data['job_id'], body=json.loads(str_data))
-   except:
-        pass
+   except  Exception as e: print(e)
+        
 

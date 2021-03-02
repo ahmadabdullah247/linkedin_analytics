@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import time
 import pandas as pd
 from utils.helpers import *
+from urllib.parse import urlencode, quote_plus
 
 
 
@@ -15,24 +16,25 @@ class LinkedInJobsScraper:
         self.query = query
         self.job_ids = [] ## list for holding per page job ids
         
-        self.scraper_config = read_config(config_path) ## loading configuration
+        self.scraper_config, self.credentials = read_config(config_path) ## loading configuration
         self.scraper_logger = get_logger() ## get logger for logging system state
         self.scraper_history = list(set(read_from_file(self.scraper_config['scraper_history_file'])))
 
-        self.es_client = Elasticsearch([{'host': self.scraper_config['es_host'], 
-                                        'port': self.scraper_config['es_port']}])
-    
-    def search_jobs_ids(self):
         
+
+        self.es_client = Elasticsearch(hosts=self.scraper_config['es_host'])
+                                        
+    
+    def search_jobs_ids(self, search_term):
         for i in range(self.scraper_config['total_search_pages']):
             # Set the URL you want to webscrape from
-            url = self.scraper_config['search_url'].format(i)
+            url = self.scraper_config['search_url'].format(search_term,i)
 
             self.scraper_logger.info('Searching jobs in page {}/{}'.format(i+1, self.scraper_config['total_search_pages']))
             # Connect to the URL
             response = requests.get(url)
 
-            # Parse HTML and save to BeautifulSoup object¶
+            # Parse HTML and save to BeautifulSoup object
             soup = BeautifulSoup(response.text, "html.parser")
             
             self.scraper_logger.info('Extracting Job Ids from the page')
@@ -64,7 +66,7 @@ class LinkedInJobsScraper:
         # Connect to the URL
         response = requests.get(url)
 
-        # Parse HTML and save to BeautifulSoup object¶
+        # Parse HTML and save to BeautifulSoup object
         soup = BeautifulSoup(response.text, "html.parser")
         job_info = {}
         ## find jd section
@@ -133,12 +135,12 @@ class LinkedInJobsScraper:
         
 
 def main():
-    
-    
-    
     #job_ids = list(set(read_from_file(scraper.scraper_config['job_ids_file'])))
     scraper = LinkedInJobsScraper(num_jobs=-1, query=None)
-    scraper.search_jobs_ids()
+    """ for search_term in scraper.scraper_config['search_terms']:
+        search_term = "%20".join(search_term.split())
+        scraper.search_jobs_ids(search_term)"""
+    write_to_es(scraper.scraper_config['es_index'], {'job_info':'abc'}, scraper.es_client)
 if __name__ == "__main__":
     main()
     
