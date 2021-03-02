@@ -55,14 +55,7 @@ class LinkedInJobsScraper:
         for job in jobs:
             self.job_ids.append('{}'.format(job[self.scraper_config['job_id_element_identifier']]))
 
-        self.scraper_logger.info('Writing job ids to file')
-        job_ids_str = "\n".join(self.job_ids)
-        #write_to_file(job_ids_str, self.scraper_config['jobs_ids_file'])
 
-        #self.scraper_logger.info('Lets go again!')
-        ## flush historical job ids
-        #self.job_ids = []
-    
     def get_job_data(self, job_id):
         url = self.scraper_config['li_jobs_api'].format(job_id)
         # Connect to the URL
