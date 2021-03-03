@@ -4,11 +4,11 @@ from scraper.exceptions.exception import InvalidConfigurationException
 from datetime import datetime, timedelta
 from dateutil.relativedelta import *
 #from elasticsearch import Elasticsearch 
+from scraper.config.credentials import credentials
 import json
 import pymongo
 
 def read_config(config_path):
-    credentials_path = 'scraper/config/credentials.yaml'
     if not config_path:
         config_path = 'scraper/config/scraper_config.yaml'
 
@@ -16,12 +16,7 @@ def read_config(config_path):
         # The FullLoader parameter handles the conversion from YAML
         # scalar values to Python the dictionary format
         scraper_config = yaml.load(file, Loader=yaml.FullLoader)
-        
-    with open(r'{}'.format(credentials_path)) as creds_file:
-        # The FullLoader parameter handles the conversion from YAML
-        # scalar values to Python the dictionary format
-        credentials = yaml.load(creds_file, Loader=yaml.FullLoader)
-    
+        print(credentials)
     return (scraper_config, credentials)
 
 def get_logger():
