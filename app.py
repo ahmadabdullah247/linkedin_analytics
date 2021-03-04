@@ -21,7 +21,7 @@ def start_scraper():
         scraper.search_jobs_ids(search_term)
 
 
-@scheduler.scheduled_job('interval', seconds=10)
+@scheduler.scheduled_job('interval', hours=6)
 def offline_worker():
     scraper = LinkedInJobsScraper(num_jobs=-1, query=None)
     total_search_terms = len(scraper.scraper_config['search_terms'])
