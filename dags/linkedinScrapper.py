@@ -7,10 +7,18 @@ from airflow.operators.subdag_operator import SubDagOperator
 import requests
 from bs4 import BeautifulSoup
 
+
+# Pytroch 
+# https://www.youtube.com/watch?v=SKq-pmkekTk&list=PLlMkM4tgfjnJ3I-dbhO9JTw7gNty6o_2m&ab_channel=SungKim
+
 # db setup 
 # https://airflow.apache.org/docs/apache-airflow/stable/howto/set-up-database.html
 # for authentication
 # https://stackoverflow.com/questions/52056809/how-to-activate-authentication-in-apache-airflow/52057433
+
+# Container deployment 
+# Linked in scrayper
+# Make python package
 
 # Set default args
 default_args = {
