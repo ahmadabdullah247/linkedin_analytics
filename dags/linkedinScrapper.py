@@ -7,6 +7,17 @@ from airflow.operators.subdag_operator import SubDagOperator
 import requests
 from bs4 import BeautifulSoup
 
+import pymongo, yaml
+from LIB.UTILS.logs import get_logger
+from linkedin_job_scraper import LinkedInJobScraper
+from LIB.CONFIG.credentials import credentials
+
+# get config file
+with open("dags/LIB/CONFIG/scraper.yaml", "r") as f:
+    config = yaml.load(f)
+    
+# initialize logs
+log = get_logger('LinkedInJobScraper') 
 
 # Pytroch 
 # https://www.youtube.com/watch?v=SKq-pmkekTk&list=PLlMkM4tgfjnJ3I-dbhO9JTw7gNty6o_2m&ab_channel=SungKim
@@ -15,6 +26,9 @@ from bs4 import BeautifulSoup
 # https://airflow.apache.org/docs/apache-airflow/stable/howto/set-up-database.html
 # for authentication
 # https://stackoverflow.com/questions/52056809/how-to-activate-authentication-in-apache-airflow/52057433
+
+# !pip install pyyaml pymongo 'pymongo[srv]'
+# !python -m pip install 'mongo[srv]' dnspython
 
 # Container deployment 
 # Linked in scrayper
@@ -34,6 +48,16 @@ default_args = {
 # Set Schedule: Run pipeline once a day.
 # Use cron to define exact time (UTC). Eg. 8:15 AM would be '15 08 * * *'
 schedule_interval = '30 09 * * *'
+
+# connecting to database 
+try:
+    log.info('Trying to connect to database')
+    client = pymongo.MongoClient(config['mongo_connect_url'].format(credentials['mongo_username'],credentials['mongo_password'],'jobs'))#,config['mongo_db'])
+    db = client["linkedin_jobs"]
+    collection = db["jobs"]
+except Exception as e:
+    log.error('Error connecting to database: ',e)
+
 
 # Define DAG: Set ID and assign default args and schedule interval
 dag = DAG(
@@ -77,21 +101,8 @@ def subdag(parent_dag_name, child_dag_name, args):
 
 
 def get_job_ids(**context):
-    total_pages=1
-    job_ids = []
-    for i in range(total_pages):
-        # Set the URL you want to webscrape from
-        url = 'https://www.linkedin.com/jobs/search?keywords=Software%20Engineer&location=Berlin%2C%20Berlin%2C%20Germany&geoId=&trk=homepage-jobseeker_jobs-search-bar_search-submit&redirect=false&position=1&pageNum={}'.format(i)
-        # Connect to the URL
-        response = requests.get(url)
-
-        # Parse HTML and save to BeautifulSoup object¶
-        soup = BeautifulSoup(response.text, "html.parser")
-        
-        ## extract job ids from the selected page
-        jobs = soup.findAll("li", attrs={"class":"result-card job-result-card result-card--with-hover-state"})
-        job_ids.append([job["data-id"] for job in jobs])
-
+    scraper = LinkedInJobScraper(100, None)
+    job_ids = scraper.search_jobs_ids('Software Engineer')
     context['ti'].xcom_push(key='jobIds', value=job_ids)
     # return job_ids
 
@@ -111,11 +122,15 @@ def get_job_description(**context):
     return job_descriptions
 
 def consolidating_job_ids(**context):
-    # get job ids form all sub-tasks
-    job_ids = context['ti'].xcom_pull(key='jobIds')
-    
-    # save only unique from them
-    # Take out id's that are already in database 
+    # get uniqe ids
+    job_ids = list(set(job_ids))
+    # filter ids that are not present in database
+    job_ids = list(filter(lambda x: collection.count({ '_id': x }, limit = 1) == 0, job_ids))
+    # get job descriptions
+    job_descriptions = [scraper.get_job_description(job_id) for job_id in job_ids]
+    # inserting jobs in database
+    for job in job_descriptions:    
+        collection.insert_one(job)   
 
 
 with dag:
@@ -144,4 +159,4 @@ with dag:
 
     end = DummyOperator(task_id="end")
 
-    start >> task_get_job_ids >> task_consolidating_job_ids >> task_get_job_description >> end
+    start >> task_get_job_ids #>> task_consolidating_job_ids >> task_get_job_description >> end

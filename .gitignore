@@ -1,3 +1,5 @@
+src/config/passwords.yaml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -14,7 +16,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -26,6 +27,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+src/config/passwords.yaml
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -128,8 +130,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# mac folder file 
-.DS_Store
-.vscode
-# Data Store 
-/DATA
+
+.vscode 
