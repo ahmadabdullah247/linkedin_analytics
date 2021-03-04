@@ -21,11 +21,13 @@ def start_scraper():
         scraper.search_jobs_ids(search_term)
 
 
-@scheduler.scheduled_job('interval', hours=6)
+@scheduler.scheduled_job('interval', seconds=10)
 def offline_worker():
-    print("[SCHEDULER] LAST RUN: %s" % datetime.now())
     scraper = LinkedInJobsScraper(num_jobs=-1, query=None)
-    for search_term in scraper.scraper_config['search_terms']:
+    total_search_terms = len(scraper.scraper_config['search_terms'])
+    scraper.scraper_logger.info("[SCHEDULER] LAST RUN: {}".format(datetime.now()))
+    for index, search_term in enumerate(scraper.scraper_config['search_terms']):
+        scraper.scraper_logger.info("[SCRAPER] RUNNING FOR SEARCH TERM: [{}/{}]".format(index, total_search_terms))
         search_term = "%20".join(search_term.split())
         scraper.search_jobs_ids(search_term)
 
