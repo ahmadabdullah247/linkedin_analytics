@@ -34,4 +34,4 @@ def offline_worker():
 
 #scheduler.start() ## using aps scheduler
 if __name__ == "__main__":
-    main()
+    offline_worker()
