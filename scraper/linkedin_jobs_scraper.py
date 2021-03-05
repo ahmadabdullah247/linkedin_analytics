@@ -46,6 +46,8 @@ class LinkedInJobsScraper:
             if len(self.job_ids) > 0:
                 self.scraper_logger.info('Found {} new jobs'.format(len(self.job_ids)))
                 self.fetch_job_info()
+            else:
+                self.scraper_logger.info('Found {} new jobs'.format(len(self.job_ids)))
             
 
     def extract_job_ids(self, soup):
