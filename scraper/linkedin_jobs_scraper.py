@@ -43,7 +43,8 @@ class LinkedInJobsScraper:
             ## extract job ids from the selected page
             self.extract_job_ids(soup)
 
-            if len(self.job_ids):
+            if len(self.job_ids) > 0:
+                self.scraper_logger.info('Found {} new jobs'.format(len(self.job_ids)))
                 self.fetch_job_info()
             
 
