@@ -58,6 +58,7 @@ try:
 except Exception as e:
     log.error('Error connecting to database: ',e)
 
+scraper = LinkedInJobScraper(100, None)
 
 # Define DAG: Set ID and assign default args and schedule interval
 dag = DAG(
@@ -67,79 +68,42 @@ dag = DAG(
   schedule_interval= schedule_interval)
 
 
-def subdag(parent_dag_name, child_dag_name, args):
-    """
-    Generate a DAG to be used as a subdag.
-
-    :param str parent_dag_name: Id of the parent DAG
-    :param str child_dag_name: Id of the child DAG
-    :param dict args: Default arguments to provide to the subdag
-    :return: DAG to use as a subdag
-    :rtype: airflow.models.DAG
-    """
-    dag_subdag = DAG(
-        dag_id=f'{parent_dag_name}.{child_dag_name}',
-        default_args=default_args,
-        start_date=days_ago(2),
-        schedule_interval="@daily",
-    )
-
-    with dag_subdag:
-        task_SE_job_ids = PythonOperator(
-            task_id='Software_Engineer_Job_Ids', 
-            python_callable=get_job_ids, 
-            provide_context=True,
-            dag=dag_subdag)
-
-        task_DE_job_ids = PythonOperator(
-            task_id='Data_Engineer_Job_Ids', 
-            python_callable=get_job_ids, 
-            provide_context=True,
-            dag=dag_subdag)
-
-    return dag_subdag
-
 
 def get_job_ids(**context):
-    scraper = LinkedInJobScraper(100, None)
     job_ids = scraper.search_jobs_ids('Software Engineer')
+    print(job_ids)
     context['ti'].xcom_push(key='jobIds', value=job_ids)
-    # return job_ids
-
-def get_job_description(**context):
-    job_descriptions = []
-    job_ids = context['ti'].xcom_pull(key='jobIds')
-    
-    for job_id in job_ids:
-        url = "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{}".format(job_id)
-        # Connect to the URL
-        response = requests.get(url)
-        # Parse HTML and save to BeautifulSoup object¶
-        soup = BeautifulSoup(response.text, "html.parser")
-        description = soup.find("section",attrs={"class":"description"}).text
-        job_descriptions.append(description)
-
-    return job_descriptions
 
 def consolidating_job_ids(**context):
+    job_ids = context['ti'].xcom_pull(key='jobIds')
     # get uniqe ids
     job_ids = list(set(job_ids))
     # filter ids that are not present in database
     job_ids = list(filter(lambda x: collection.count({ '_id': x }, limit = 1) == 0, job_ids))
+    print(job_ids)
+    context['ti'].xcom_push(key='jobIds', value=job_ids)
+
+
+def get_job_description(**context):
+    job_descriptions = []
+    job_ids = context['ti'].xcom_pull(key='jobIds')
     # get job descriptions
     job_descriptions = [scraper.get_job_description(job_id) for job_id in job_ids]
+    print("yolo",job_descriptions)
     # inserting jobs in database
     for job in job_descriptions:    
-        collection.insert_one(job)   
+        collection.insert_one(job)  
+
+
 
 
 with dag:
     start = DummyOperator(task_id="start")
 
     # Task 1: scraping job ids from linkedin
-    task_get_job_ids = SubDagOperator(
-        task_id='Get_Job_Ids',
-        subdag=subdag('Linkedin_Scrapper', 'Get_Job_Ids', default_args),
+    task_get_job_ids= PythonOperator(
+        task_id='get_job_ids', 
+        python_callable=get_job_ids, 
         provide_context=True,
         dag=dag)
 
@@ -159,4 +123,4 @@ with dag:
 
     end = DummyOperator(task_id="end")
 
-    start >> task_get_job_ids #>> task_consolidating_job_ids >> task_get_job_description >> end
+    start >> task_get_job_ids >> task_consolidating_job_ids >> task_get_job_description >> end
